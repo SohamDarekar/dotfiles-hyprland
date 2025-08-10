@@ -2,8 +2,7 @@
 
 This is my personal Hyprland shell setup. Most of this repo was built by [Axenide](https://github.com/axenide).
 
-**Purpose:**  
-Just a backup in case I break something.  
+**Purpose:** Just a backup in case I break something.  
 
 ## Important Info
 
