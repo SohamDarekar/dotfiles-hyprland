@@ -290,7 +290,13 @@ while true; do
     fi
 
     # Check for low battery
-    if [[ "$CURRENT_LEVEL" -le 30 && "$CURRENT_STATUS" == "Discharging" ]]; then
+    if [[ "$CURRENT_LEVEL" -le 10 && "$CURRENT_STATUS" == "Discharging" ]]; then
+        if [[ "$LOW_NOTIFIED" != "critical" || "$PREV_LEVEL" -gt 10 || "$PREV_STATUS" != "Discharging" ]]; then
+            notify-send "Battery Status" "${CURRENT_LEVEL}% - Low Battery (Critical)" -i "battery-low" -a "System" -u critical
+            log_message "Sent critical low battery notification"
+            LOW_NOTIFIED="critical"
+        fi
+    elif [[ "$CURRENT_LEVEL" -le 30 && "$CURRENT_STATUS" == "Discharging" ]]; then
         if [[ "$LOW_NOTIFIED" != "true" || "$PREV_LEVEL" -gt 30 || "$PREV_STATUS" != "Discharging" ]]; then
             notify-send "Battery Status" "${CURRENT_LEVEL}% - Low Battery" -i "battery-low" -a "System" -u critical
             log_message "Sent low battery notification"
