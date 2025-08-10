@@ -45,7 +45,8 @@
   background-color: var(--shadow);
   margin: 8px;
   margin-bottom: 4px;
-  min-width: 330px;
+  min-width: 390px;
+  min-height: 20px;
 }
 
 #notification-navigation {
