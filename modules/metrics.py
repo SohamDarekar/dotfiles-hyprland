@@ -93,31 +93,6 @@ class MetricsProvider:
         GLib.idle_add(self._process_gpu_output, output, error_message)
         self._gpu_update_running = False
 
-    def _process_gpu_output(self, output, error_message):
-        """Process nvtop JSON output on the main loop."""
-        try:
-            if error_message:
-                logger.error(f"GPU update failed: {error_message}")
-                self.gpu = []
-            elif output:
-                info = json.loads(output)
-                try:
-                    self.gpu = [int(v["gpu_util"][:-1]) for v in info]
-                except (KeyError, ValueError, TypeError) as e:
-                    logger.error(f"Failed parsing nvtop JSON: {e}")
-                    self.gpu = []
-            else:
-                logger.warning("nvtop returned no output.")
-                self.gpu = []
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON decode error: {e}")
-            self.gpu = []
-        except Exception as e:
-            logger.error(f"Error processing nvtop output: {e}")
-            self.gpu = []
-
-        return False
-
     def get_metrics(self):
         return (self.cpu, self.mem, self.disk, self.gpu)
 
