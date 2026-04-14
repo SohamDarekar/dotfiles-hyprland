@@ -14,7 +14,7 @@ from fabric.widgets.label import Label
 from fabric.widgets.overlay import Overlay
 from fabric.widgets.revealer import Revealer
 from fabric.widgets.scale import Scale
-from gi.repository import GLib
+from gi.repository import GLib, Gdk
 
 import config.data as data
 from modules.upower.upower import UPowerManager
@@ -92,6 +92,23 @@ class MetricsProvider:
 
         GLib.idle_add(self._process_gpu_output, output, error_message)
         self._gpu_update_running = False
+
+    def _process_gpu_output(self, output, error_message):
+        """Parses nvtop JSON output and updates self.gpu with utilization percentages."""
+        if output is None:
+            return False
+        try:
+            devices = json.loads(output)
+            self.gpu = []
+            for device in devices:
+                util_str = device.get("gpu_util", "0%") or "0%"
+                try:
+                    self.gpu.append(float(util_str.rstrip("%")))
+                except (ValueError, AttributeError):
+                    self.gpu.append(0.0)
+        except (json.JSONDecodeError, Exception) as e:
+            logger.error(f"GPU JSON parse error: {e}")
+        return False
 
     def get_metrics(self):
         return (self.cpu, self.mem, self.disk, self.gpu)
@@ -297,7 +314,6 @@ class MetricsSmall(Button):
         GLib.timeout_add_seconds(1, self.update_metrics)
 
         self.hide_timer = None
-        self.hover_counter = 0
 
     def _format_percentage(self, value: int) -> str:
         """Formato natural del porcentaje sin forzar ancho fijo."""
@@ -305,7 +321,8 @@ class MetricsSmall(Button):
 
     def on_mouse_enter(self, widget, event):
         if not data.VERTICAL:
-            self.hover_counter += 1
+            if event.detail == Gdk.NotifyType.INFERIOR:
+                return False
             if self.hide_timer is not None:
                 GLib.source_remove(self.hide_timer)
                 self.hide_timer = None
@@ -320,12 +337,11 @@ class MetricsSmall(Button):
 
     def on_mouse_leave(self, widget, event):
         if not data.VERTICAL:
-            if self.hover_counter > 0:
-                self.hover_counter -= 1
-            if self.hover_counter == 0:
-                if self.hide_timer is not None:
-                    GLib.source_remove(self.hide_timer)
-                self.hide_timer = GLib.timeout_add(500, self.hide_revealer)
+            if event.detail == Gdk.NotifyType.INFERIOR:
+                return False
+            if self.hide_timer is not None:
+                GLib.source_remove(self.hide_timer)
+            self.hide_timer = GLib.timeout_add(500, self.hide_revealer)
             return False
 
     def hide_revealer(self):
@@ -424,7 +440,6 @@ class Battery(Button):
         GLib.idle_add(self.update_battery, None, shared_provider.get_battery())
 
         self.hide_timer = None
-        self.hover_counter = 0
 
     def _format_percentage(self, value: int) -> str:
         """Formato natural del porcentaje sin forzar ancho fijo."""
@@ -432,7 +447,8 @@ class Battery(Button):
 
     def on_mouse_enter(self, widget, event):
         if not data.VERTICAL:
-            self.hover_counter += 1
+            if event.detail == Gdk.NotifyType.INFERIOR:
+                return False
             if self.hide_timer is not None:
                 GLib.source_remove(self.hide_timer)
                 self.hide_timer = None
@@ -442,12 +458,11 @@ class Battery(Button):
 
     def on_mouse_leave(self, widget, event):
         if not data.VERTICAL:
-            if self.hover_counter > 0:
-                self.hover_counter -= 1
-            if self.hover_counter == 0:
-                if self.hide_timer is not None:
-                    GLib.source_remove(self.hide_timer)
-                self.hide_timer = GLib.timeout_add(500, self.hide_revealer)
+            if event.detail == Gdk.NotifyType.INFERIOR:
+                return False
+            if self.hide_timer is not None:
+                GLib.source_remove(self.hide_timer)
+            self.hide_timer = GLib.timeout_add(500, self.hide_revealer)
             return False
 
     def hide_revealer(self):
