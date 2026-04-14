@@ -233,10 +233,10 @@ class NotificationBox(Box):
         self.notification_body_label = Label(
             markup=notification.body,
             h_align="start",
-            max_chars_width=34,
-            ellipsization="end",
+            ellipsization="none",
         ) if notification.body else Box()
-        self.notification_body_label.set_single_line_mode(True) if notification.body else None
+        self.notification_body_label.set_line_wrap(True) if notification.body else None
+        self.notification_body_label.set_line_wrap_mode(2) if notification.body else None
         self.notification_text_box = Box(
             name="notification-text",
             orientation="v",

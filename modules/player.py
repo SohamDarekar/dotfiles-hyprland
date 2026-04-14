@@ -2,6 +2,7 @@ import os
 import tempfile
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone, timedelta
 
 from fabric.widgets.box import Box
 from fabric.widgets.button import Button
@@ -78,6 +79,13 @@ class PlayerBox(Box):
         self.title.set_label("Nothing Playing")
         self.album.set_label("Enjoy the silence")
         self.artist.set_label("¯\\_(ツ)_/¯")
+        self._ist_offset = timezone(timedelta(hours=5, minutes=30))
+        self.india_time = Label(
+            name="player-india-time",
+            label=self._get_india_time(),
+            h_align="center",
+        )
+        GLib.timeout_add_seconds(1, self._update_india_time)
         self.progressbar.set_value(0.0)
         self.prev = Button(
             name="player-btn",
@@ -146,6 +154,7 @@ class PlayerBox(Box):
         )
 
         self.p_children=[
+            self.india_time,
             self.overlay_container,
             self.title,
             self.album,
@@ -197,6 +206,14 @@ class PlayerBox(Box):
             self.next.add_style_class("disabled")
             self.progressbar.set_value(0.0)
             self.time.set_text("--:-- / --:--")
+
+    def _get_india_time(self):
+        now = datetime.now(self._ist_offset)
+        return now.strftime("%I:%M %p  IST")
+
+    def _update_india_time(self):
+        self.india_time.set_label(self._get_india_time())
+        return True  # keep the timer running
 
     def _apply_mpris_properties(self):
         mp = self.mpris_player

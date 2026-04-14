@@ -189,3 +189,10 @@
 #player-switcher-vertical.stack-switcher button label {
   font-size: 0px;
 }
+
+#player-india-time {
+  font-size: 10pt;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 4px;
+}

@@ -3,3 +3,4 @@ Ax-Shell.code-workspace
 .aider*
 config/dock.json
 config/dock.json.bak
+config/hypr/ax-shell.conf.bak

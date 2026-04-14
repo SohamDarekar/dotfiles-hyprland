@@ -56,9 +56,10 @@ apply_power_mode() {
     local mode=$1
     local notify=${2:-true}
     local source=${3:-"Auto"}
-    
+    local level=$(cat "$BATTERY_PATH/capacity" 2>/dev/null || echo "?")
+
     log_message "Applying power mode: $mode ($source)"
-    
+
     case "$mode" in
         "performance")
             # Set CPU governor to performance
@@ -87,7 +88,7 @@ apply_power_mode() {
             fi
             
             if [ "$notify" = "true" ]; then
-                notify-send "Power Mode" "Performance Mode Active ($source)" -i "battery-good" -a "System" -u normal
+                notify-send "Performance Mode" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-good.svg" -a "System" -u normal
                 log_message "Sent performance mode notification"
             fi
             ;;
@@ -112,7 +113,7 @@ apply_power_mode() {
             fi
             
             if [ "$notify" = "true" ]; then
-                notify-send "Power Mode" "Power Saving Active ($source)" -i "battery-low" -a "System" -u normal
+                notify-send "Power Saving" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-low.svg" -a "System" -u normal
                 log_message "Sent power saving mode notification"
             fi
             ;;
@@ -144,7 +145,7 @@ apply_power_mode() {
             fi
             
             if [ "$notify" = "true" ]; then
-                notify-send "Power Mode" "Ultra Power Saving Active ($source)" -i "battery-caution" -a "System" -u normal
+                notify-send "Ultra Power Saving" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-caution.svg" -a "System" -u normal
                 log_message "Sent ultra power saving mode notification"
             fi
             ;;
@@ -176,7 +177,7 @@ apply_power_mode() {
             fi
             
             if [ "$notify" = "true" ]; then
-                notify-send "Power Mode" "Power Saving Disabled ($source)" -i "battery-full" -a "System" -u normal
+                notify-send "Power Saving Disabled" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-full.svg" -a "System" -u normal
                 log_message "Sent disabled power saving mode notification"
             fi
             ;;
@@ -279,26 +280,26 @@ while true; do
         log_message "Status changed from $PREV_STATUS to $CURRENT_STATUS"
         case "$CURRENT_STATUS" in
             "Charging")
-                notify-send "Battery Status" "${CURRENT_LEVEL}% - Charging" -i "battery-charging" -a "System" -u normal
+                notify-send "Charging" "Battery: ${CURRENT_LEVEL}%" -i "/usr/share/icons/Papirus/24x24/panel/battery-000-charging.svg" -a "System" -u normal
                 log_message "Sent charging notification"
                 ;;
             "Discharging"|"Not charging")
-                notify-send "Battery Status" "${CURRENT_LEVEL}% - Discharging" -i "battery" -a "System" -u normal
+                notify-send "Discharging" "Battery: ${CURRENT_LEVEL}%" -i "/usr/share/icons/Papirus/24x24/panel/battery-good.svg" -a "System" -u normal
                 log_message "Sent discharging notification"
                 ;;
         esac
     fi
 
     # Check for low battery
-    if [[ "$CURRENT_LEVEL" -le 10 && "$CURRENT_STATUS" == "Discharging" ]]; then
-        if [[ "$LOW_NOTIFIED" != "critical" || "$PREV_LEVEL" -gt 10 || "$PREV_STATUS" != "Discharging" ]]; then
-            notify-send "Battery Status" "${CURRENT_LEVEL}% - Low Battery (Critical)" -i "battery-low" -a "System" -u critical
+    if [[ "$CURRENT_LEVEL" -le 15 && "$CURRENT_STATUS" == "Discharging" ]]; then
+        if [[ "$LOW_NOTIFIED" != "critical" || "$PREV_LEVEL" -gt 15 || "$PREV_STATUS" != "Discharging" ]]; then
+            notify-send "Critical Battery" "Battery: ${CURRENT_LEVEL}% · Plug in now" -i "/usr/share/icons/Papirus/24x24/panel/battery-caution.svg" -a "System" -u critical
             log_message "Sent critical low battery notification"
             LOW_NOTIFIED="critical"
         fi
     elif [[ "$CURRENT_LEVEL" -le 30 && "$CURRENT_STATUS" == "Discharging" ]]; then
         if [[ "$LOW_NOTIFIED" != "true" || "$PREV_LEVEL" -gt 30 || "$PREV_STATUS" != "Discharging" ]]; then
-            notify-send "Battery Status" "${CURRENT_LEVEL}% - Low Battery" -i "battery-low" -a "System" -u critical
+            notify-send "Low Battery" "Battery: ${CURRENT_LEVEL}% · Plug in soon" -i "/usr/share/icons/Papirus/24x24/panel/battery-low.svg" -a "System" -u critical
             log_message "Sent low battery notification"
             LOW_NOTIFIED="true"
         fi

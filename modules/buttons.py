@@ -243,7 +243,7 @@ class BluetoothButton(Box):
             name="bluetooth-status-button",
             h_expand=True,
             child=self.bluetooth_status_container,
-            on_clicked=lambda *_: self.widgets.bluetooth.client.toggle_power(),
+            on_clicked=self._on_bluetooth_clicked,
         )
         add_hover_cursor(self.bluetooth_status_button)
         self.bluetooth_menu_label = Label(
@@ -259,6 +259,25 @@ class BluetoothButton(Box):
 
         self.add(self.bluetooth_status_button)
         self.add(self.bluetooth_menu_button)
+
+    def _on_bluetooth_clicked(self, *_):
+        client = self.widgets.bluetooth.client
+        if not client.enabled:
+            # rfkill soft-blocks BT when powered off; unblock then power on
+            handler_id = [None]
+            def _on_enabled(*_):
+                if client.enabled:
+                    self.widgets.show_bt()
+                    if not client.scanning:
+                        client.toggle_scan()
+                    if handler_id[0] is not None:
+                        client.disconnect(handler_id[0])
+                        handler_id[0] = None
+            handler_id[0] = client.connect("notify::enabled", _on_enabled)
+            exec_shell_command_async("bash -c 'rfkill unblock bluetooth && bluetoothctl power on'")
+        else:
+            # BT already on — turn it off
+            exec_shell_command_async("bluetoothctl power off")
 
 class NightModeButton(Button):
     def __init__(self):

@@ -119,15 +119,10 @@ class BluetoothConnections(Box):
         )
 
         self.client.connect("notify::enabled", lambda *_: self.status_label())
+        self.client.connect("notify::state", lambda *_: self.status_label())
         self.client.connect(
             "notify::scanning",
             lambda *_: self.update_scan_label()
-        )
-        
-        # Add bluetooth toggle functionality
-        self.bt_status_button.connect(
-            "clicked", 
-            lambda *_: self.client.set_enabled(not self.client.enabled)
         )
 
         self.paired_box = Box(spacing=2, orientation="vertical")

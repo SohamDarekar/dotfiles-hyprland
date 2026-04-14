@@ -229,7 +229,7 @@ class WallpaperSelector(Box):
         os.symlink(full_path, current_wall)
 
         if self.matugen_switcher.get_active():
-            exec_shell_command_async(f'matugen image "{full_path}" -t {selected_scheme}')
+            exec_shell_command_async(f'matugen image "{full_path}" -t {selected_scheme} --source-color-index 0')
         else:
             exec_shell_command_async(
                 f'swww img "{full_path}" -t outer --transition-duration 1.5 --transition-step 255 --transition-fps 60 -f Nearest'
@@ -316,7 +316,7 @@ class WallpaperSelector(Box):
         os.symlink(full_path, current_wall)
         if self.matugen_switcher.get_active():
             # Matugen is enabled: run the normal command.
-            exec_shell_command_async(f'matugen image "{full_path}" -t {selected_scheme}')
+            exec_shell_command_async(f'matugen image "{full_path}" -t {selected_scheme} --source-color-index 0')
         else:
             # Matugen is disabled: run the alternative swww command.
             exec_shell_command_async(
@@ -537,7 +537,7 @@ class WallpaperSelector(Box):
         print(f"Applying color from slider: H={hue_value}, HEX={hex_color}")
         selected_scheme = self.scheme_dropdown.get_active_id()
         # Run matugen with the chosen hex color and selected scheme
-        exec_shell_command_async(f'matugen color hex "{hex_color}" -t {selected_scheme}')
+        exec_shell_command_async(f'matugen color hex "{hex_color}" -t {selected_scheme} --source-color-index 0')
         # Optionally save the chosen color to config if needed later
         # config.config.bind_vars["matugen_hex_color"] = hex_color
         # config.config.save_config() # Removed as save_config doesn't exist
