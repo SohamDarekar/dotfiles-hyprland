@@ -4,8 +4,9 @@ set -e  # Exit immediately if a command fails
 set -u  # Treat unset variables as errors
 set -o pipefail  # Prevent errors in a pipeline from being masked
 
-REPO_URL="https://github.com/Axenide/Ax-Shell.git"
 INSTALL_DIR="$HOME/.config/Ax-Shell"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_URL="$(git -C "$SCRIPT_DIR" remote get-url origin 2>/dev/null || echo "https://github.com/Axenide/Ax-Shell.git")"
 PACKAGES=(
   brightnessctl
   cava
@@ -25,8 +26,12 @@ PACKAGES=(
   noto-fonts-emoji
   nvtop
   playerctl
+    python-cairo
   python-fabric-git
   python-gobject
+    python-loguru
+    python-opengl
+    python-dbus
   python-ijson
   python-numpy
   python-pillow
@@ -79,10 +84,10 @@ fi
 
 # Install required packages using the detected AUR helper (only if missing)
 echo "Installing required packages..."
-$aur_helper -Syy --needed --devel --noconfirm "${PACKAGES[@]}" || true
+$aur_helper -Syy --needed --devel --noconfirm "${PACKAGES[@]}"
 
 echo "Installing gray-git..."
-yes | $aur_helper -Syy --needed --devel --noconfirm gray-git || true
+$aur_helper -Syy --needed --devel --noconfirm gray-git
 
 echo "Installing required fonts..."
 
@@ -109,7 +114,7 @@ fi
 if [ ! -d "$HOME/.fonts/tabler-icons" ]; then
     echo "Copying local fonts to $HOME/.fonts/tabler-icons..."
     mkdir -p "$HOME/.fonts/tabler-icons"
-    cp -r "$INSTALL_DIR/assets/fonts/"* "$HOME/.fonts"
+    cp -r "$INSTALL_DIR/assets/fonts/tabler-icons" "$HOME/.fonts/"
 else
     echo "Local fonts are already installed. Skipping copy."
 fi

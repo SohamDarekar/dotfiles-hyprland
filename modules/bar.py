@@ -39,7 +39,6 @@ tooltip_apps = f"""<b><u>Launcher</u></b>
   e.g. ";100 USD to EUR", ";10 km to miles"
 
 <b>• Special Commands [Prefix ":"]:</b>
-  :update - Open {data.APP_NAME_CAP}'s updater.
   :d - Open Dashboard.
   :w - Open Wallpapers."""
 
