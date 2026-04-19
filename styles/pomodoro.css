@@ -1,0 +1,255 @@
+/* ── Pomodoro Timer ──────────────────────────────────────────────────── */
+
+#pomodoro {
+  border-radius: 20px;
+}
+
+#pomo-outer {
+  padding: 20px 28px;
+}
+
+#pomo-ring-wrap {
+  padding: 4px;
+}
+
+#pomo-right {
+  min-width: 240px;
+}
+
+/* ── Session dots ────────────────────────────────────────────────────── */
+
+#pomo-dots {
+  background-color: alpha(black, 0.3);
+  border-radius: 20px;
+  padding: 5px 18px;
+}
+
+#pomo-dot {
+  font-size: 18px;
+  color: var(--outline);
+  min-width: 22px;
+}
+
+#pomo-dot-filled {
+  font-size: 18px;
+  color: var(--primary);
+  min-width: 22px;
+}
+
+/* ── Mode selector ───────────────────────────────────────────────────── */
+
+#pomo-mode-box {
+  background-color: alpha(black, 0.3);
+  border-radius: 16px;
+  padding: 3px 4px;
+}
+
+#pomo-mode-btn {
+  background-color: transparent;
+  border-radius: 12px;
+  padding: 5px 14px;
+  font-size: 14px;
+  color: var(--outline);
+  transition: all 0.15s ease;
+}
+
+#pomo-mode-btn:hover {
+  background-color: alpha(white, 0.13);
+  color: var(--foreground);
+  border: 1px solid alpha(white, 0.15);
+}
+
+#pomo-mode-btn:active {
+  background-color: alpha(white, 0.10);
+}
+
+#pomo-mode-btn.active {
+  background-color: var(--surface-bright);
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* ── Control buttons ─────────────────────────────────────────────────── */
+
+#pomo-controls {
+  padding: 2px 0;
+}
+
+#pomo-btn-play {
+  background-color: var(--primary);
+  border-radius: 50px;
+  min-width: 56px;
+  min-height: 46px;
+  padding: 8px 20px;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 3px 12px alpha(black, 0.4);
+}
+
+#pomo-btn-play label {
+  color: var(--on-primary);
+  font-size: 22px;
+}
+
+#pomo-btn-play:hover {
+  background-color: var(--foreground);
+  border-radius: 16px;
+}
+
+#pomo-btn-play:active {
+  background-color: var(--secondary);
+}
+
+#pomo-btn-play.done {
+  background-color: var(--surface-bright);
+}
+
+#pomo-btn-play.done label {
+  color: var(--outline);
+}
+
+#pomo-btn-sm {
+  background-color: alpha(black, 0.3);
+  border-radius: 50px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 6px 12px;
+  border: 1px solid alpha(white, 0.06);
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#pomo-btn-sm label,
+#pomo-btn-icon {
+  color: var(--foreground);
+  font-size: 20px;
+}
+
+#pomo-btn-sm:hover {
+  background-color: alpha(white, 0.15);
+  border-radius: 14px;
+  border: 1px solid alpha(white, 0.2);
+}
+
+#pomo-btn-sm:active {
+  background-color: alpha(black, 0.5);
+}
+
+/* Red stop icon button */
+#pomo-btn-stop {
+  background-color: alpha(black, 0.3);
+  border-radius: 50px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 6px 12px;
+  border: 1px solid alpha(white, 0.06);
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#pomo-btn-stop label {
+  color: var(--red);
+  font-size: 20px;
+}
+
+#pomo-btn-stop:hover {
+  background-color: alpha(var(--red), 0.15);
+  border-radius: 14px;
+  border: 1px solid alpha(var(--red), 0.3);
+}
+
+#pomo-btn-stop:active {
+  background-color: var(--error-container);
+}
+
+/* Stop All — separate text button below controls */
+#pomo-btn-stop-all {
+  background-color: transparent;
+  border-radius: 50px;
+  padding: 4px 22px;
+  min-height: 30px;
+  border: 1px solid var(--outline);
+  transition: all 0.15s ease;
+}
+
+#pomo-btn-stop-all label {
+  color: var(--red);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#pomo-btn-stop-all:hover {
+  border: 1px solid var(--red);
+  background-color: alpha(var(--red), 0.12);
+}
+
+#pomo-btn-stop-all:active {
+  background-color: var(--error-container);
+}
+
+/* ── Duration selectors ──────────────────────────────────────────────── */
+
+#pomo-dur-box {
+  background-color: alpha(black, 0.25);
+  border-radius: 18px;
+  padding: 10px 16px;
+  margin-top: 2px;
+}
+
+#pomo-ts-box {
+  border-radius: 0;
+}
+
+#pomo-ts-head {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--outline);
+  /* letter-spacing not supported in GTK CSS */
+}
+
+#pomo-ts-pill {
+  background-color: var(--surface-bright);
+  border-radius: 50px;
+  min-width: 108px;
+  border: 1px solid alpha(white, 0.07);
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+#pomo-ts-pill:hover {
+  background-color: var(--surface);
+  border: 1px solid alpha(white, 0.2);
+  box-shadow: 0 0 0 2px alpha(var(--primary), 0.15);
+}
+
+#pomo-ts-btn {
+  background-color: transparent;
+  border-radius: 50px;
+  min-width: 30px;
+  min-height: 32px;
+  padding: 2px 8px;
+  transition: background-color 0.1s ease;
+}
+
+#pomo-ts-btn label {
+  font-size: 17px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+#pomo-ts-btn:hover {
+  background-color: alpha(white, 0.09);
+}
+
+#pomo-ts-btn:active {
+  background-color: alpha(white, 0.16);
+}
+
+#pomo-ts-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--foreground);
+  min-width: 34px;
+}
+
+#pomo-ts-unit {
+  font-size: 13px;
+  color: var(--outline);
+}

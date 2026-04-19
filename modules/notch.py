@@ -512,7 +512,7 @@ class Notch(Window):
 
         dashboard_sections_map = {
             #"pins": self.dashboard.pins,
-            "kanban": self.dashboard.kanban,
+            "pomodoro": self.dashboard.pomodoro,
             "wallpapers": self.dashboard.wallpapers,
         }
         if widget_name in dashboard_sections_map:

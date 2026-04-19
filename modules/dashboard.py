@@ -14,8 +14,8 @@ gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import Gdk, GdkPixbuf, GLib, Gtk
 
 import modules.icons as icons
-from modules.kanban import Kanban
 from modules.pins import Pins
+from modules.pomodoro import PomodoroTimer
 from modules.wallpapers import WallpaperSelector
 from modules.widgets import Widgets
 
@@ -37,7 +37,7 @@ class Dashboard(Box):
         
         self.widgets = Widgets(notch=self.notch)
         self.pins = Pins()
-        self.kanban = Kanban()
+        self.pomodoro = PomodoroTimer()
         self.wallpapers = WallpaperSelector()
 
         self.stack = Stack(
@@ -104,7 +104,7 @@ class Dashboard(Box):
 
         self.stack.add_titled(self.widgets, "widgets", "Widgets")
         #self.stack.add_titled(self.pins, "pins", "Pins")
-        self.stack.add_titled(self.kanban, "kanban", "Kanban")
+        self.stack.add_titled(self.pomodoro, "pomodoro", "Pomodoro")
         self.stack.add_titled(self.wallpapers, "wallpapers", "Wallpapers")
         #self.stack.add_titled(self.coming_soon, "coming-soon", "Coming soon...")
 
@@ -127,7 +127,7 @@ class Dashboard(Box):
         icon_details_map = {
             "Widgets": {"icon": icons.widgets, "name": "widgets"},
             "Pins": {"icon": icons.pins, "name": "pins"},
-            "Kanban": {"icon": icons.kanban, "name": "kanban"},
+            "Pomodoro": {"icon": icons.timer_on, "name": "pomodoro"},
             "Wallpapers": {"icon": icons.wallpapers, "name": "wallpapers"},
             "Coming soon...": {"icon": icons.sparkles, "name": "coming-soon"},
         }
@@ -211,8 +211,8 @@ class Dashboard(Box):
             self.stack.set_visible_child(self.widgets)
         # elif section_name == "pins":
         #     self.stack.set_visible_child(self.pins)
-        elif section_name == "kanban":
-            self.stack.set_visible_child(self.kanban)
+        elif section_name == "pomodoro":
+            self.stack.set_visible_child(self.pomodoro)
         elif section_name == "wallpapers":
             self.stack.set_visible_child(self.wallpapers)
         # elif section_name == "coming-soon":

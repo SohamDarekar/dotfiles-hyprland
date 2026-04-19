@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Enhanced battery monitor with better debugging
 set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/_power_mode_actions.sh"
 
 STATE_FILE="/tmp/ax_battery_state"
 POWER_MODE_FILE="/tmp/ax_power_mode"
@@ -51,7 +53,7 @@ fi
 log_message "Using battery: $BATTERY_PATH"
 log_message "Using AC adapter: $AC_PATH"
 
-# Power management functions with error checking
+# Power management with shared system actions
 apply_power_mode() {
     local mode=$1
     local notify=${2:-true}
@@ -59,131 +61,23 @@ apply_power_mode() {
     local level=$(cat "$BATTERY_PATH/capacity" 2>/dev/null || echo "?")
 
     log_message "Applying power mode: $mode ($source)"
+    _apply_power_actions "$mode"
+    log_message "Applied system settings for $mode"
 
-    case "$mode" in
-        "performance")
-            # Set CPU governor to performance
-            if echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1; then
-                log_message "CPU governor set to performance"
-            else
-                log_message "ERROR: Failed to set CPU governor to performance"
-            fi
-            
-            # Re-enable all CPU cores
-            for cpu in {1..7}; do
-                if echo 1 | sudo tee /sys/devices/system/cpu/cpu$cpu/online > /dev/null 2>&1; then
-                    log_message "Enabled CPU core $cpu"
-                fi
-            done
-            
-            # Restore normal brightness
-            if command -v brightnessctl > /dev/null; then
-                if brightnessctl set 80% > /dev/null 2>&1; then
-                    log_message "Brightness set to 80%"
-                else
-                    log_message "ERROR: Failed to set brightness to 80%"
-                fi
-            else
-                log_message "WARNING: brightnessctl not available"
-            fi
-            
-            if [ "$notify" = "true" ]; then
-                notify-send "Performance Mode" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-good.svg" -a "System" -u normal
-                log_message "Sent performance mode notification"
-            fi
-            ;;
-            
-        "powersave")
-            # Set CPU governor to powersave
-            if echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1; then
-                log_message "CPU governor set to powersave"
-            else
-                log_message "ERROR: Failed to set CPU governor to powersave"
-            fi
-            
-            # Reduce brightness
-            if command -v brightnessctl > /dev/null; then
-                if brightnessctl set 50% > /dev/null 2>&1; then
-                    log_message "Brightness set to 50%"
-                else
-                    log_message "ERROR: Failed to set brightness to 50%"
-                fi
-            else
-                log_message "WARNING: brightnessctl not available"
-            fi
-            
-            if [ "$notify" = "true" ]; then
-                notify-send "Power Saving" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-low.svg" -a "System" -u normal
-                log_message "Sent power saving mode notification"
-            fi
-            ;;
-            
-        "ultra-powersave")
-            # Set CPU governor to powersave
-            if echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1; then
-                log_message "CPU governor set to powersave"
-            else
-                log_message "ERROR: Failed to set CPU governor to powersave"
-            fi
-            
-            # Disable half of CPU cores
-            for cpu in {1..3}; do
-                if echo 0 | sudo tee /sys/devices/system/cpu/cpu$cpu/online > /dev/null 2>&1; then
-                    log_message "Disabled CPU core $cpu"
-                fi
-            done
-            
-            # Set minimum brightness
-            if command -v brightnessctl > /dev/null; then
-                if brightnessctl set 20% > /dev/null 2>&1; then
-                    log_message "Brightness set to 20%"
-                else
-                    log_message "ERROR: Failed to set brightness to 20%"
-                fi
-            else
-                log_message "WARNING: brightnessctl not available"
-            fi
-            
-            if [ "$notify" = "true" ]; then
-                notify-send "Ultra Power Saving" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-caution.svg" -a "System" -u normal
-                log_message "Sent ultra power saving mode notification"
-            fi
-            ;;
-            
-        "disabled")
-            # When power saving is disabled, ensure performance mode
-            if echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1; then
-                log_message "CPU governor set to performance (disabled mode)"
-            else
-                log_message "ERROR: Failed to set CPU governor to performance (disabled mode)"
-            fi
-            
-            # Re-enable all CPU cores
-            for cpu in {1..7}; do
-                if echo 1 | sudo tee /sys/devices/system/cpu/cpu$cpu/online > /dev/null 2>&1; then
-                    log_message "Enabled CPU core $cpu (disabled mode)"
-                fi
-            done
-            
-            # Restore normal brightness
-            if command -v brightnessctl > /dev/null; then
-                if brightnessctl set 80% > /dev/null 2>&1; then
-                    log_message "Brightness set to 80% (disabled mode)"
-                else
-                    log_message "ERROR: Failed to set brightness to 80% (disabled mode)"
-                fi
-            else
-                log_message "WARNING: brightnessctl not available"
-            fi
-            
-            if [ "$notify" = "true" ]; then
-                notify-send "Power Saving Disabled" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-full.svg" -a "System" -u normal
-                log_message "Sent disabled power saving mode notification"
-            fi
-            ;;
-    esac
-    
-    # Save current power mode
+    if [ "$notify" = "true" ]; then
+        case "$mode" in
+            performance)
+                notify-send "Performance Mode" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-good.svg" -a "System" -u normal ;;
+            powersave)
+                notify-send "Power Saving" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-low.svg" -a "System" -u normal ;;
+            ultra-powersave)
+                notify-send "Ultra Power Saving" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-caution.svg" -a "System" -u normal ;;
+            disabled)
+                notify-send "Power Saving Disabled" "Battery: ${level}% · $source" -i "/usr/share/icons/Papirus/24x24/panel/battery-full.svg" -a "System" -u normal ;;
+        esac
+        log_message "Sent $mode notification"
+    fi
+
     echo "$mode" > "$POWER_MODE_FILE"
     log_message "Saved power mode: $mode"
 }
@@ -266,7 +160,7 @@ while true; do
                     NEW_POWER_MODE="powersave"
                     apply_power_mode "$NEW_POWER_MODE" true "Auto"
                 fi
-            elif [ "$CURRENT_LEVEL" -gt 60 ]; then
+            elif [ "$CURRENT_LEVEL" -gt 40 ]; then
                 if [ "$CURRENT_POWER_MODE" != "performance" ]; then
                     NEW_POWER_MODE="performance"
                     apply_power_mode "$NEW_POWER_MODE" true "Auto"

@@ -8,7 +8,7 @@
 @import url("./styles/dock.css");
 @import url("./styles/emoji.css");
 @import url("./styles/extras.css");
-@import url("./styles/kanban.css");
+@import url("./styles/pomodoro.css");
 @import url("./styles/launcher.css");
 @import url("./styles/metrics.css");
 @import url("./styles/notch.css");
@@ -35,8 +35,7 @@
 #header,
 #player,
 #metrics,
-#pin-cell-box,
-#kanban-header {
+#pin-cell-box {
   background-color: alpha(black, 0.5);
 }
 
