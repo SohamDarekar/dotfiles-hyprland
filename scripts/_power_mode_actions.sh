@@ -8,7 +8,7 @@ _apply_power_actions() {
         performance|disabled)
             echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1
             for cpu in {1..7}; do echo 1 | sudo tee /sys/devices/system/cpu/cpu$cpu/online > /dev/null 2>&1; done
-            command -v brightnessctl > /dev/null && brightnessctl set 80% > /dev/null 2>&1
+            command -v brightnessctl > /dev/null && brightnessctl set 100% > /dev/null 2>&1
             ;;
         powersave)
             echo "powersave" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null 2>&1

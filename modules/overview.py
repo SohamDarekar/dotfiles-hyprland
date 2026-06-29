@@ -22,8 +22,12 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
 screen = Gdk.Screen.get_default()
-CURRENT_WIDTH = screen.get_width()
-CURRENT_HEIGHT = screen.get_height()
+if screen is not None:
+   CURRENT_WIDTH = screen.get_width()
+   CURRENT_HEIGHT = screen.get_height()
+else:
+   CURRENT_WIDTH = 1920
+   CURRENT_HEIGHT = 1080
 
 icon_resolver = IconResolver()
 connection = Hyprland()
