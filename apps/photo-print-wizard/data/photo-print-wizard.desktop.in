@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Photo Print Wizard
+Comment=Lay out and print photos with professional layouts
+Exec=__EXEC__ %U
+Icon=photo-print-wizard
+Terminal=false
+Categories=Graphics;Photography;Printing;
+StartupWMClass=dev.sohamdarekar.PhotoPrintWizard
+MimeType=image/jpeg;image/png;image/webp;image/tiff;image/bmp;image/gif;image/heif;image/heic;

@@ -98,6 +98,22 @@ If install fails, check these first:
 - `SUPER + SHIFT + B`: reload CSS
 - `SUPER + ALT + B`: reload Ax-Shell
 
+## Suspend/Resume Fix (NVIDIA hybrid laptop)
+
+- Symptom: `SUPER CTRL S` suspend, then stuck on hyprlock black screen on resume, needed TTY2→TTY1 switch to unstick.
+- Root cause: `nvidia-suspend/hibernate/resume` systemd services were disabled, no `NVreg_PreserveVideoMemoryAllocations` — GPU VRAM state not saved/restored across suspend.
+- Fix applied (system-level, not this repo's config):
+  - `/etc/modprobe.d/nvidia-power-management.conf`:
+    ```
+    options nvidia NVreg_PreserveVideoMemoryAllocations=1
+    options nvidia NVreg_TemporaryFilePath=/var/tmp
+    ```
+  - `sudo systemctl enable nvidia-suspend.service nvidia-hibernate.service nvidia-resume.service`
+  - `sudo mkinitcpio -P` after the modprobe conf change.
+- Tried `mem_sleep_default=deep` (real S3) in GRUB to speed up resume — made it worse (full black-screen hang, no keystroke/mouse response, kernel log showed `PM: suspend entry (deep)` with no exit). Reverted to default `s2idle`.
+- Remaining ~5-15s black screen before hyprlock appears on resume is expected: Alder Lake iGPU (i915) reloads GuC/HuC firmware every resume (mandatory, visible in `journalctl` as `GT0: GuC firmware ... version` / `HuC ... authenticated`). Not a bug, tradeoff for GuC power-saving; disabling via `i915.enable_guc=0` removes delay but hurts battery/perf — not recommended.
+- No changes were made to any file under `~/.config/hypr/` or Ax-Shell config for this fix.
+
 ## Recovery Checklist
 
 - If Ax-Shell does not start, verify Hyprland is launching `uwsm` and that `main.py` runs cleanly.

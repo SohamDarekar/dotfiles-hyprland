@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3584e4"/>
+      <stop offset="1" stop-color="#1c71d8"/>
+    </linearGradient>
+    <linearGradient id="photo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f2f2f2"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#bg)"/>
+
+  <!-- back photo -->
+  <g transform="translate(30,22) rotate(-8 34 42)">
+    <rect x="0" y="0" width="60" height="76" rx="4" fill="#ffffff" opacity="0.55"/>
+  </g>
+
+  <!-- front photo -->
+  <g transform="translate(38,30)">
+    <rect x="0" y="0" width="58" height="72" rx="4" fill="url(#photo)" stroke="#0b3d91" stroke-width="1.5"/>
+    <rect x="7" y="7" width="44" height="34" rx="2" fill="#8bb8f0"/>
+    <circle cx="17" cy="17" r="5" fill="#ffd166"/>
+    <path d="M7 40 L22 27 L34 37 L44 24 L51 32 L51 41 L7 41 Z" fill="#3584e4"/>
+    <rect x="7" y="48" width="44" height="4" rx="2" fill="#c7d6ea"/>
+    <rect x="7" y="56" width="30" height="4" rx="2" fill="#c7d6ea"/>
+  </g>
+
+  <!-- printer feed lines -->
+  <g stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.85">
+    <line x1="34" y1="104" x2="94" y2="104"/>
+    <line x1="34" y1="112" x2="80" y2="112"/>
+  </g>
+</svg>

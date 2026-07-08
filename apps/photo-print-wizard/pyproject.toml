@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "photo-print-wizard"
+version = "0.1.0"
+description = "Native GTK4/Libadwaita photo printing wizard for Linux"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "Soham Darekar" }]
+dependencies = [
+    "PyGObject>=3.50",
+    "pycairo>=1.26",
+    "pycups>=2.0",
+    "Pillow>=11.0",
+    "pillow-heif>=0.18",
+]
+
+[project.optional-dependencies]
+facecrop = ["opencv-python-headless>=4.9"]
+dev = ["pytest>=8.0", "ruff>=0.6", "black>=24.0"]
+
+[project.scripts]
+photo-print-wizard = "photo_print_wizard.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/photo_print_wizard"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# PyGObject requires gi.require_version() calls before the gi.repository
+# import they configure, which is structurally an import-after-code.
+"src/photo_print_wizard/ui/*.py" = ["E402"]
+"src/photo_print_wizard/app.py" = ["E402"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
