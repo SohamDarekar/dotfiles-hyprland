@@ -71,10 +71,16 @@ end
 
 hl.bind("CTRL + SHIFT + S", hl.dsp.exec_cmd("grimblast copy area"))
 hl.bind("SUPER + W",        hl.dsp.window.close())
-hl.bind("SUPER + F",        hl.dsp.exec_cmd("hyprctl dispatch fullscreen 1"))
+-- fullscreen_state({internal=1,client=0}) = MAXIMIZED (respects bar's
+-- reserved zone). Plain fullscreen(1) actually gives real FULLSCREEN
+-- (mode 2), covering the bar -- verified against live hyprctl activewindow.
+-- action="toggle" is required too: without it, pressing the bind again
+-- while already maximized does nothing (re-applies the same state instead
+-- of reverting) -- also verified live.
+hl.bind("SUPER + F",        hl.dsp.window.fullscreen_state({ internal = 1, client = 0, action = "toggle" }))
 hl.bind("SUPER + E",        hl.dsp.exec_cmd("nautilus"))
 hl.bind("SUPER + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
-hl.bind("SUPER + CTRL + F",  hl.dsp.exec_cmd("hyprctl dispatch pin"))
+hl.bind("SUPER + CTRL + F",  hl.dsp.window.pin())
 
 hl.bind("SUPER + G",      hl.dsp.exec_cmd("nm-connection-editor"))
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("kitty"))
@@ -84,7 +90,7 @@ hl.bind("SUPER + right", hl.dsp.focus({ direction = "right" }))
 hl.bind("SUPER + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind("SUPER + down",  hl.dsp.focus({ direction = "down" }))
 
-hl.bind("SUPER + M",         hl.dsp.exec_cmd("hyprctl dispatch movetoworkspacesilent special:minimized"))
+hl.bind("SUPER + M",         hl.dsp.window.move({ workspace = "special:minimized" }))
 hl.bind("SUPER + SHIFT + M", hl.dsp.workspace.toggle_special("minimized"))
 
 hl.bind("SUPER + mouse:272", hl.dsp.window.drag(),   { mouse = true })
@@ -92,15 +98,15 @@ hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("code"))
 
-hl.bind("SUPER + CTRL + left",  hl.dsp.exec_cmd("hyprctl dispatch resizeactive -50 0"))
-hl.bind("SUPER + CTRL + right", hl.dsp.exec_cmd("hyprctl dispatch resizeactive 50 0"))
-hl.bind("SUPER + CTRL + up",    hl.dsp.exec_cmd("hyprctl dispatch resizeactive 0 -50"))
-hl.bind("SUPER + CTRL + down",  hl.dsp.exec_cmd("hyprctl dispatch resizeactive 0 50"))
+hl.bind("SUPER + CTRL + left",  hl.dsp.window.resize({ x = -50, y = 0 }))
+hl.bind("SUPER + CTRL + right", hl.dsp.window.resize({ x = 50, y = 0 }))
+hl.bind("SUPER + CTRL + up",    hl.dsp.window.resize({ x = 0, y = -50 }))
+hl.bind("SUPER + CTRL + down",  hl.dsp.window.resize({ x = 0, y = 50 }))
 
-hl.bind("SUPER + ALT + left",  hl.dsp.exec_cmd("hyprctl dispatch moveactive -50 0"))
-hl.bind("SUPER + ALT + right", hl.dsp.exec_cmd("hyprctl dispatch moveactive 50 0"))
-hl.bind("SUPER + ALT + up",    hl.dsp.exec_cmd("hyprctl dispatch moveactive 0 -50"))
-hl.bind("SUPER + ALT + down",  hl.dsp.exec_cmd("hyprctl dispatch moveactive 0 50"))
+hl.bind("SUPER + ALT + left",  hl.dsp.window.move({ x = -50, y = 0 }))
+hl.bind("SUPER + ALT + right", hl.dsp.window.move({ x = 50, y = 0 }))
+hl.bind("SUPER + ALT + up",    hl.dsp.window.move({ x = 0, y = -50 }))
+hl.bind("SUPER + ALT + down",  hl.dsp.window.move({ x = 0, y = 50 }))
 
 hl.bind("SUPER + EQUAL", hl.dsp.exec_cmd(fabricSend .. [[ 'notch.open_notch("calculator")']]))
 
