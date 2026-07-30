@@ -23,21 +23,25 @@ local colors = loadColors("/home/soh4m/.config/Ax-Shell/config/hypr/colors.conf"
 local fabricSend = "fabric-cli exec ax-shell"
 local axMessage = [[notify-send "Axenide" "FIRE IN THE HOLE‼️🗣️🔥🕳️" -i "/home/soh4m/.config/Ax-Shell/assets/ax.png" -A "🗣️" -A "🔥" -A "🕳️" -a "Source Code"]]
 
-hl.on("hyprland.start", function()
-    hl.exec_cmd("uwsm-app $(python /home/soh4m/.config/Ax-Shell/main.py)")
-    hl.exec_cmd("~/.config/Ax-Shell/scripts/monitor-watcher.sh")
-    hl.exec_cmd([[wl-paste --type text --watch cliphist store]])
-    hl.exec_cmd([[wl-paste --type image --watch cliphist store]])
-    hl.exec_cmd("~/.local/bin/mount-homelab")
-    hl.exec_cmd("/usr/lib/hyprpolkitagent")
-    hl.exec_cmd("gnome-keyring-daemon --start --components=secrets,pkcs11,ssh")
-    hl.exec_cmd("chmod +x ~/.config/Ax-Shell/scripts/battery-monitor.sh && ~/.config/Ax-Shell/scripts/battery-monitor.sh")
-    hl.exec_cmd([[pgrep -x "hypridle" > /dev/null || uwsm app -- hypridle]])
-    hl.exec_cmd("uwsm app -- swww-daemon")
-    hl.exec_cmd("swww img ~/.current.wall")
-end)
+-- exec-once equivalent: plain top-level calls run once as this script loads.
+-- (hl.on("hyprland.start", ...) is NOT reliable for this -- that event fires
+-- inconsistently relative to when this file's require() runs, so autostart
+-- here silently no-op'd on some boots. The official example config never
+-- uses hyprland.start for autostart either, only plain top-level exec_cmd.)
+hl.exec_cmd("uwsm app -- python /home/soh4m/.config/Ax-Shell/main.py")
+hl.exec_cmd("~/.config/Ax-Shell/scripts/monitor-watcher.sh")
+hl.exec_cmd([[wl-paste --type text --watch cliphist store]])
+hl.exec_cmd([[wl-paste --type image --watch cliphist store]])
+hl.exec_cmd("~/.local/bin/mount-homelab")
+hl.exec_cmd("/usr/lib/hyprpolkitagent")
+hl.exec_cmd("gnome-keyring-daemon --start --components=secrets,pkcs11,ssh")
+hl.exec_cmd("chmod +x ~/.config/Ax-Shell/scripts/battery-monitor.sh && ~/.config/Ax-Shell/scripts/battery-monitor.sh")
+hl.exec_cmd("swww img ~/.current.wall")
 
--- these two ran on every hyprlang reload (plain `exec`, not `exec-once`)
+-- hypridle/swww-daemon launch only lives here (fires on cold boot too, not
+-- just manual reloads) -- do NOT also start them in the block above, that
+-- caused a duplicate swww-daemon launch racing for the same IPC socket and
+-- aborting (systemd-coredump showed two swww-daemon crashes every boot).
 hl.on("config.reloaded", function()
     hl.exec_cmd([[pgrep -x "hypridle" > /dev/null || uwsm app -- hypridle]])
     hl.exec_cmd("uwsm app -- swww-daemon")
@@ -45,9 +49,12 @@ end)
 
 -- lazy/detach unmount so a dead/slow homelab SSH connection can never block
 -- reboot/shutdown in an uninterruptible FUSE wait (observed: kernel hung-task
--- warning on fuse_do_getattr, needed a hard power cycle to recover)
+-- warning on fuse_do_getattr, needed a hard power cycle to recover). Lazy
+-- unmount alone only detaches the mountpoint -- the sshfs process's
+-- underlying ssh child keeps running and is what systemd-shutdown then
+-- waits on, so kill that process too instead of just detaching.
 hl.on("hyprland.shutdown", function()
-    hl.exec_cmd([[fusermount3 -uz "$HOME/Homelab" 2>/dev/null || true]])
+    hl.exec_cmd([[fusermount3 -uz "$HOME/Homelab" 2>/dev/null; pkill -9 -f "sshfs nexus-vps-local" 2>/dev/null; pkill -9 -f "ssh:.*nexus-vps-local" 2>/dev/null || true]])
 end)
 
 ----------------------------
@@ -102,7 +109,7 @@ hl.bind("SUPER + L",         hl.dsp.exec_cmd("hyprlock"))
 hl.bind("SUPER + U",         hl.dsp.exec_cmd("/home/soh4m/.local/bin/monitor-menu"))
 hl.bind("SUPER + CTRL + S",  hl.dsp.exec_cmd("systemctl suspend"))
 
-hl.bind("SUPER + ALT + B", hl.dsp.exec_cmd("killall ax-shell; uwsm-app $(python /home/soh4m/.config/Ax-Shell/main.py)"))
+hl.bind("SUPER + ALT + B", hl.dsp.exec_cmd([[systemctl --user stop 'app-Hyprland-python-*.scope' 2>/dev/null; sleep 0.3; uwsm app -- python /home/soh4m/.config/Ax-Shell/main.py]]))
 
 hl.bind("SUPER + A", hl.dsp.exec_cmd("/home/soh4m/.config/Ax-Shell/scripts/show_battery_status.sh"))
 
@@ -121,7 +128,7 @@ hl.bind("SUPER + PERIOD", hl.dsp.exec_cmd(fabricSend .. [[ 'notch.open_notch("em
 hl.bind("SUPER + ESCAPE", hl.dsp.exec_cmd(fabricSend .. [[ 'notch.open_notch("power")']]))
 hl.bind("SUPER + SHIFT + C", hl.dsp.exec_cmd(fabricSend .. [[ 'notch.dashboard.widgets.buttons.caffeine_button.toggle_inhibit(external=True)']]))
 hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd(fabricSend .. [[ 'app.set_css()']]))
-hl.bind("SUPER + CTRL + ALT + B", hl.dsp.exec_cmd("killall ax-shell; uwsm-app $(GTK_DEBUG=interactive python /home/soh4m/.config/Ax-Shell/main.py)"))
+hl.bind("SUPER + CTRL + ALT + B", hl.dsp.exec_cmd([[systemctl --user stop 'app-Hyprland-python-*.scope' 2>/dev/null; sleep 0.3; GTK_DEBUG=interactive uwsm app -- python /home/soh4m/.config/Ax-Shell/main.py]]))
 
 hl.bind("SUPER + P",                 hl.dsp.exec_cmd("~/.config/Ax-Shell/scripts/set_power_mode.sh powersave"))
 hl.bind("SUPER + ALT + P",           hl.dsp.exec_cmd("~/.config/Ax-Shell/scripts/set_power_mode.sh ultra-powersave"))
