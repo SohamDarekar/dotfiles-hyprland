@@ -666,29 +666,6 @@ class Bar(Window):
             buttons=self.workspace_buttons_num,
         )
 
-        # Fabric's Workspaces.do_handle_scroll only matches discrete
-        # Gdk.ScrollDirection.UP/DOWN (mouse wheel) and silently no-ops on
-        # SMOOTH (touchpad), so scrolling the workspace pill on a laptop
-        # touchpad never dispatched. Handle SMOOTH ourselves alongside it.
-        def _handle_smooth_ws_scroll(widget, event):
-            if event.direction != Gdk.ScrollDirection.SMOOTH:
-                return False
-            if event.delta_y < 0:
-                widget.action_previous() if widget._invert_scroll else widget.action_next()
-            elif event.delta_y > 0:
-                widget.action_next() if widget._invert_scroll else widget.action_previous()
-            else:
-                return False
-            return True
-
-        # "scroll" events= above only enables SCROLL_MASK; SMOOTH_SCROLL_MASK
-        # is a separate bit GTK needs to actually deliver touchpad scroll
-        # events at all, not just to interpret them correctly.
-        self.workspaces.add_events(Gdk.EventMask.SMOOTH_SCROLL_MASK)
-        self.workspaces_num.add_events(Gdk.EventMask.SMOOTH_SCROLL_MASK)
-        self.workspaces.connect("scroll-event", _handle_smooth_ws_scroll)
-        self.workspaces_num.connect("scroll-event", _handle_smooth_ws_scroll)
-
         self.ws_container = Box(
             name="workspaces-container",
             children=(
