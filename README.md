@@ -74,6 +74,8 @@ If install fails, check these first:
 - Settings GUI behavior: `config/settings_gui.py`
 - Runtime startup: `main.py`
 - Package installer: `install.sh`
+- External monitor scaling and display quality: `MONITOR_CONFIG.md` — covers
+  several files that live outside this repo and are not tracked anywhere else
 
 ## How I Reload Things
 
